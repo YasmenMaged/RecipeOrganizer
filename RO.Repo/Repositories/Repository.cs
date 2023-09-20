@@ -1,4 +1,6 @@
-﻿namespace RO.Repo;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace RO.Repo;
 
 public class Repository<T> : IRepository<T> where T : BaseEntity
 {

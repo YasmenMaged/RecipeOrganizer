@@ -16,7 +16,7 @@ public class RecipesController : ControllerBase
 
     [HttpGet]
     [Route("{id}")]
-    public IActionResult GetRecipeById(Guid id) => Ok( _recipeService.GetRecipeById(id));
+    public IActionResult GetRecipeWithIngredients(Guid id) => Ok(_recipeService.GetRecipeWithIngredient(id));
 
     [HttpPost("add")]
     public IActionResult AddRecipe(Recipe recipe) => Ok( _recipeService.AddRecipe(recipe));

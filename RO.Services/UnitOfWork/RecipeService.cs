@@ -3,14 +3,15 @@
 public class RecipeService : IRecipeService
 {
     private IRepository<Recipe> _repository { get; set; }
-    public RecipeService(IRepository<Recipe> repository)
+    private AppDbContext _recipeContext { get; set; }
+
+    public RecipeService(IRepository<Recipe> repository, AppDbContext recipeContext)
     {
         _repository = repository;
+        _recipeContext = recipeContext;
     }
 
     public IEnumerable<Recipe> GetAllRecipes() => _repository.GetAll();
-
-    public Recipe GetRecipeById(Guid id) => _repository.Get(id);
 
     public string AddRecipe(Recipe recipe) => _repository.Insert(recipe);
 
@@ -22,6 +23,17 @@ public class RecipeService : IRecipeService
         recipeFromDb.Description = recipe.Description;
 
         return _repository.Update(recipe, id);
+    }
+
+    public RecipeWithIngredientsVM GetRecipeWithIngredient(Guid id)
+    {
+        var Recipe = _recipeContext.Recipes.Where(n => n.Id == id).Select(n => new RecipeWithIngredientsVM()
+        {
+            Name = n.Name,
+            IngredientName = n.Recipe_Ingredient.Select(n => n.Ingredient.Name).ToList()
+        }).FirstOrDefault();
+
+        return Recipe;
     }
 
     public string RemoveRecipe(Guid id)
