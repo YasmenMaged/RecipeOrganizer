@@ -1,4 +1,6 @@
-﻿namespace RO.Services;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace RO.Services;
 
 public class RecipeService : IRecipeService
 {
@@ -35,7 +37,42 @@ public class RecipeService : IRecipeService
 
         return Recipe;
     }
+    public string GetRecipeByListOfIngredients(List<string> Ingredients)
+    {
+        foreach (Recipe Recipe in _recipeContext.Recipes.ToList())
+        {
 
+            var recipeFromDb = _recipeContext.Recipes.Where(n => n.Id == Recipe.Id).Select(n => new RecipeWithIngredientsVM()
+            {
+                Name = n.Name,
+                IngredientName = n.Recipe_Ingredient.Select(n => n.Ingredient.Name).ToList()
+            }).FirstOrDefault();
+            if (recipeFromDb.IngredientName.Count() != Ingredients.Count())
+            {
+                return ("Please enter the correct Ingredients.");
+            }
+            recipeFromDb.IngredientName.Sort();
+            Ingredients.Sort();
+
+            bool exist = true;
+            for (int i = 0; i < recipeFromDb.IngredientName.Count(); i++)
+            {
+                if (recipeFromDb.IngredientName[i] != Ingredients[i])
+                {
+                    exist = false;
+                    break;
+
+                }
+            }
+            if (exist == true)
+            {
+                return (Recipe.Name);
+            }
+
+        }
+
+        return ("No matching recipes found.");
+    }
     public string RemoveRecipe(Guid id)
     {
 

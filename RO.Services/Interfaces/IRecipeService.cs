@@ -10,5 +10,7 @@ public interface IRecipeService
 
     public RecipeWithIngredientsVM GetRecipeWithIngredient(Guid id);
 
+    string GetRecipeByListOfIngredients(List<string> Ingredients);
+
     string RemoveRecipe(Guid id);
 }
