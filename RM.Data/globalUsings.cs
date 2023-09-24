@@ -1,4 +1,6 @@
-﻿global using System.Runtime.Serialization;
+﻿global using MimeKit;
+
+global using System.Runtime.Serialization;
 global using System.Text.Json.Serialization;
 global using System.ComponentModel.DataAnnotations;
 

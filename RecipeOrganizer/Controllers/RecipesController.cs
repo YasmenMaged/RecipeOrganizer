@@ -29,5 +29,4 @@ public class RecipesController : ControllerBase
 
     [HttpDelete]
     public IActionResult RemoveRecipe(Guid id) => Ok( _recipeService.RemoveRecipe(id));
-
 }
