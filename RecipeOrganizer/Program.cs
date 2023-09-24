@@ -44,6 +44,16 @@ builder.Services.AddAuthentication(options =>
 //    };
 //});
 
+//Add Email Configs
+
+var emailConfig = configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
+builder.Services.AddSingleton(emailConfig);
+
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+builder.Services.AddControllers();
+
+
 //dependency injection
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IRecipeService, RecipeService>();

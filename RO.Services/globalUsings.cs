@@ -2,4 +2,5 @@
 global using RO.Repo;
 global using static RO.Repo.IRepository;
 
-global using Microsoft.EntityFrameworkCore;
+global using MimeKit;
+global using MailKit.Net.Smtp;
