@@ -1,7 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+﻿using Microsoft.AspNetCore.Authorization;
+using System.ComponentModel.DataAnnotations;
 
 namespace RecipeOrganizer;
 
@@ -63,7 +61,9 @@ public class AuthunticationController : ControllerBase
             //Add Token to Verify the email....
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationLink = Url.Action(nameof(ConfirmEmail), "Authentication", new { token, email = user.Email }, Request.Scheme);
+            //look here
+            var confirmationLink = "https://localhost:44303/api/Authuntication/ConfirmEmail?token=" + token + "&email=" + user.Email;
+               // Url.Action(nameof(ConfirmEmail), "Authentication", new { token, email = user.Email }, Request.Scheme);
             var message = new Message(new string[] { user.Email! }, "Confirmation email link", confirmationLink!);
             _emailService.SendEmail(message);
 
@@ -143,6 +143,31 @@ public class AuthunticationController : ControllerBase
 
     }
 
+    //[HttpPost("ForgetPassword")]
+    //[AllowAnonymous]
+    //public async Task<IActionResult> ForgetPassword([Required] string email)
+    //{
+    //    var user = await _userManager.FindByEmailAsync(email);
+    //    if (user != null)
+    //    {
+    //        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+    //        // var link = this.Url.Action("ResetPassword", "Authentication", new { token, email = user.Email }, Request.Scheme);
+    //        var message = new Message(email, "Forgot Password link", "yasmen");
+    //        Console.WriteLine(message.Content);
+    //        _emailService.SendEmail(message);
+    //        return Ok("Success sent!");
+    //    }
+    //    return BadRequest("Couldnot send link to email ,please try again .");
+
+    //}
+
+    [HttpPost("ResetPassword")]
+
+    public async Task<IActionResult> ResetPassword(string token, string email)
+    {
+        var model = new ResetPassword { Token = token, Email = email };
+        return Ok(new { model });
+    }
     private JwtSecurityToken GetToken(List<Claim> authClaims)
     {
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
@@ -157,5 +182,4 @@ public class AuthunticationController : ControllerBase
 
         return token;
     }
-
 }

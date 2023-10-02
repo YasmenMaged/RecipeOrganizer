@@ -11,6 +11,7 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
     {
         base.OnModelCreating(modelBuilder);
         new RecipeConfiguration(modelBuilder.Entity<Recipe>());
+        new FeedBackConfiguration(modelBuilder.Entity<FeedBack>());
         new IngredientConfiguration(modelBuilder.Entity<Ingredient>());
         new RecipeIngredientConfiguration(modelBuilder.Entity<Recipe_Ingredient>());
 

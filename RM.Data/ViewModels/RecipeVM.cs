@@ -11,3 +11,11 @@ public class RecipeWithIngredientsVM
 
     public required List<string> IngredientName { get; set; }
 }
+
+public class RecipeWithFeedBacks
+{
+    public required string Name { set; get; }
+
+    public required List<int> Rates { get; set; }
+    public required List<string> Reviews { get; set; }
+}

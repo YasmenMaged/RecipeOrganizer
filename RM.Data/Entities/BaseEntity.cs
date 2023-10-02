@@ -7,4 +7,6 @@ public class BaseEntity
 
     [Required]
     public string Name { get; set; }
+
+    public DateTime? AddedDate { get; set; }
 }

@@ -1,21 +1,35 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace RO.Services;
+﻿namespace RO.Services;
 
 public class RecipeService : IRecipeService
 {
     private IRepository<Recipe> _repository { get; set; }
     private AppDbContext _recipeContext { get; set; }
 
-    public RecipeService(IRepository<Recipe> repository, AppDbContext recipeContext)
+    private DbSet<Recipe> entities;
+    private readonly IMemoryCache _memoryCache;
+    private readonly string cachekey = "RecipeCacheKey";
+
+    public RecipeService(IRepository<Recipe> repository, AppDbContext recipeContext, IMemoryCache memoryCache)
     {
         _repository = repository;
+        _memoryCache = memoryCache;
         _recipeContext = recipeContext;
+        entities = _recipeContext.Recipes;
     }
 
     public IEnumerable<Recipe> GetAllRecipes() => _repository.GetAll();
 
-    public string AddRecipe(Recipe recipe) => _repository.Insert(recipe);
+    public string AddRecipe(Recipe recipe)
+    {
+        Recipe Recipe = new Recipe()
+        {
+
+            Name = recipe.Name,
+            Category = recipe.Category
+        };
+
+        return _repository.Insert(Recipe);
+    }
 
     public string UpdateRecipe(Recipe recipe, Guid id)
     {
@@ -73,6 +87,35 @@ public class RecipeService : IRecipeService
 
         return ("No matching recipes found.");
     }
+
+    public List<Recipe> GetRecipesByCategory(string category)
+    {
+        return _repository.GetAllWithFilter(f => f.Category.Contains(category));
+    }
+
+    public RecipeWithFeedBacks GetRecipeWithFeedBacks(Guid id)
+    {
+
+        return _memoryCache.GetOrCreate($"id:{id}", cacheEntry =>
+        {
+            var Recipe = entities.Where(n => n.Id == id).Select(n => new RecipeWithFeedBacks()
+            {
+                Name = n.Name,
+                Rates = n.FeedBacks.Select(n => n.Rate).ToList(),
+                Reviews = n.FeedBacks.Select(n => n.Review).ToList()
+            }).FirstOrDefault();
+            var cacheOptions = new MemoryCacheEntryOptions()
+           .SetSize(1) // maximum cache size in number of entries
+           .SetSlidingExpiration(TimeSpan.FromMinutes(5)) // cache expiration time after last access
+           .SetAbsoluteExpiration(TimeSpan.FromMinutes(30)); // cache expiration time after creation
+
+            _memoryCache.Set(cachekey, Recipe, cacheOptions);
+
+            return Recipe;
+
+        });
+    }
+
     public string RemoveRecipe(Guid id)
     {
 

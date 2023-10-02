@@ -3,10 +3,14 @@
 public class IngredientService : IIngredientService
 {
     private  IRepository<Ingredient> _repository { get; set; }
+    private readonly IMemoryCache _memoryCache;
+    string errorMessage = string.Empty;
+    private readonly string cachekey = "IngredientCacheKey";
 
-    public IngredientService(IRepository<Ingredient> repository)
+    public IngredientService(IRepository<Ingredient> repository, IMemoryCache memoryCache)
     {
         _repository = repository;
+        _memoryCache = memoryCache;
     }
 
     public IEnumerable<Ingredient> GetAllIngredients() => _repository.GetAll();

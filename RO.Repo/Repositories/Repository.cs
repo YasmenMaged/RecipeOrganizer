@@ -1,22 +1,27 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace RO.Repo;
+﻿namespace RO.Repo;
 
 public class Repository<T> : IRepository<T> where T : BaseEntity
 {
     private readonly AppDbContext _context;
     private readonly DbSet<T> entities;
+    private readonly IMemoryCache _memoryCache;
 
-    public Repository(AppDbContext context)
+    public Repository(AppDbContext context, IMemoryCache memoryCache)
     {
         _context = context;
+        _memoryCache = memoryCache;
         entities = context.Set<T>();
     }
     public IEnumerable<T> GetAll()
     {
         return entities.AsEnumerable();
     }
+    List<T> IRepository<T>.GetAllWithFilter(Expression<Func<T, bool>> filter)
+    {
 
+        var data = filter == null ? entities.ToList() : entities.Where(filter).ToList();
+        return data;
+    }
     public T Get(Guid id)
     {
         if (id == Guid.Empty)
